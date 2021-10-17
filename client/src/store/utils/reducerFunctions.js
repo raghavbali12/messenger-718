@@ -13,7 +13,8 @@ export const addMessageToStore = (state, payload) => {
   
   return state.map((convo) => { //fixed this to use a copy of convo instead of updating convo directly
     if (convo.id === message.conversationId) {
-      const convoCopy = { ...convo }
+      const convoCopy = { ...convo };
+      convoCopy.messages = [ ...convo.messages ];
       convoCopy.messages.push(message);
       convoCopy.latestMessageText = message.text;
       return convoCopy;
