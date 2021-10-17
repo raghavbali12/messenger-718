@@ -11,11 +11,11 @@ export const addMessageToStore = (state, payload) => {
     return [newConvo, ...state];
   }
   
-  return state.map((convo) => { //fixed this to use a copy of convo instead of updating convo directly
+  return state.map((convo) => { 
     if (convo.id === message.conversationId) {
-      const convoCopy = { ...convo };
-      convoCopy.messages = [ ...convo.messages ];
-      convoCopy.messages.push(message);
+      const convoCopy = { ...convo }; //create a copy of convo so that state isn't mutated
+      convoCopy.messages = [ ...convo.messages ]; //create a copy of the messages array because ... only copies the first level
+      convoCopy.messages.unshift(message); //use unshift to add message in a consistent order to the messages array. Output is reversed on UI render
       convoCopy.latestMessageText = message.text;
       return convoCopy;
     } else {

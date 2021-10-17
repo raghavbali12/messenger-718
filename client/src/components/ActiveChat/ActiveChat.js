@@ -35,7 +35,7 @@ const ActiveChat = (props) => {
           />
           <Box className={classes.chatContainer}>
             <Messages
-              messages={conversation.messages}
+              messages={conversation.messages.slice().reverse()} //create a copy of messages and reverse it to make sure the proper order is followed
               otherUser={conversation.otherUser}
               userId={user.id}
             />
