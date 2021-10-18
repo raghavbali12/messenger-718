@@ -35,7 +35,7 @@ const ActiveChat = (props) => {
           />
           <Box className={classes.chatContainer}>
             <Messages
-              messages={conversation.messages} //create a copy of messages and reverse it to make sure the proper order is followed
+              messages={conversation.messages}
               otherUser={conversation.otherUser}
               userId={user.id}
             />
