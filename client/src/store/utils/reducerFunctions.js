@@ -24,6 +24,24 @@ export const addMessageToStore = (state, payload) => {
   });
 };
 
+export const markMessagesAsRead = (state, payload) => {
+  const conversation = payload.conversation  
+  return state.map((convo) => {
+    if (convo.id === conversation.id) {
+      const convoCopy = { ...convo }; //create a copy of convo so that state isn't mutated
+      convoCopy.messages = [ ...convo.messages ]; //create a copy of the messages array because ... only copies the first level
+      convoCopy.messages = convoCopy.messages.map((message) => {
+        const messageCopy = { ...message };
+        messageCopy.read = true;
+        return messageCopy;
+      });
+      return convoCopy
+    } else {
+      return convo
+    }
+  })
+}
+
 export const addOnlineUserToStore = (state, id) => {
   return state.map((convo) => {
     if (convo.otherUser.id === id) {
