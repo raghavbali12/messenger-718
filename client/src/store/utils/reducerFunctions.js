@@ -24,16 +24,23 @@ export const addMessageToStore = (state, payload) => {
   });
 };
 
-export const markMessagesAsRead = (state, payload) => {
-  const conversation = payload.conversation  
+export const markMessageAsRead = (state, payload) => {
+  const message = payload.message 
+  
   return state.map((convo) => {
-    if (convo.id === conversation.id) {
+    if (convo.id === message.conversationId) {
       const convoCopy = { ...convo }; //create a copy of convo so that state isn't mutated
       convoCopy.messages = [ ...convo.messages ]; //create a copy of the messages array because ... only copies the first level
-      convoCopy.messages = convoCopy.messages.map((message) => {
-        const messageCopy = { ...message };
-        messageCopy.read = true;
-        return messageCopy;
+      convoCopy.messages = convoCopy.messages.map((convoMessage) => {
+        if (convoMessage.id === message.id) {
+          
+          const messageCopy = { ...message };
+          messageCopy.read = true;
+          return messageCopy;
+        }
+        else {
+          return convoMessage
+        }
       });
       return convoCopy
     } else {

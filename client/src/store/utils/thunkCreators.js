@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  updateExistingMessage,
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -90,6 +91,16 @@ const sendMessage = (data, body) => {
     sender: data.sender,
   });
 };
+
+export const updateMessage = (body) => async (dispatch) => {
+  try {
+    const data = await saveMessage(body);
+    dispatch(updateExistingMessage(body.otherUsername, data.message))
+
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
