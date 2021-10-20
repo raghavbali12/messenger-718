@@ -15,37 +15,50 @@ class Messages(APIView):
             if user.is_anonymous:
                 return HttpResponse(status=401)
 
-            sender_id = user.id
             body = request.data
+            sender_id = user.id
             conversation_id = body.get("conversationId")
             text = body.get("text")
             recipient_id = body.get("recipientId")
             sender = body.get("sender")
             read = body.get("read")
+            update = body.get("update")
+            id = body.get("id")
 
-            # if we already know conversation id, we can save time and just add it to message and return
-            if conversation_id:
+            if not update:
+
+                # if we already know conversation id, we can save time and just add it to message and return
+                if conversation_id:
+                    conversation = Conversation.objects.filter(id=conversation_id).first()
+                    message = Message(
+                        senderId=sender_id, text=text, conversation=conversation, read=read
+                    )
+                    message.save()
+                    message_json = message.to_dict()
+                    return JsonResponse({"message": message_json, "sender": body["sender"]})
+
+                # if we don't have conversation id, find a conversation to make sure it doesn't already exist
+                conversation = Conversation.find_conversation(sender_id, recipient_id)
+                if not conversation:
+                    # create conversation
+                    conversation = Conversation(user1_id=sender_id, user2_id=recipient_id)
+                    conversation.save()
+
+                    if sender and sender["id"] in online_users:
+                        sender["online"] = True
+
+                message = Message(senderId=sender_id, text=text, conversation=conversation, read=read)
+                message.save()
+                message_json = message.to_dict()
+                return JsonResponse({"message": message_json, "sender": sender})
+            
+            else:
+                #Update the message row in the sql table
                 conversation = Conversation.objects.filter(id=conversation_id).first()
-                message = Message(
-                    senderId=sender_id, text=text, conversation=conversation, read=read
-                )
+                message = Message.objects.get(pk=id)
+                message.read = True
                 message.save()
                 message_json = message.to_dict()
                 return JsonResponse({"message": message_json, "sender": body["sender"]})
-
-            # if we don't have conversation id, find a conversation to make sure it doesn't already exist
-            conversation = Conversation.find_conversation(sender_id, recipient_id)
-            if not conversation:
-                # create conversation
-                conversation = Conversation(user1_id=sender_id, user2_id=recipient_id)
-                conversation.save()
-
-                if sender and sender["id"] in online_users:
-                    sender["online"] = True
-
-            message = Message(senderId=sender_id, text=text, conversation=conversation, read=read)
-            message.save()
-            message_json = message.to_dict()
-            return JsonResponse({"message": message_json, "sender": sender})
         except Exception as e:
             return HttpResponse(status=500)
