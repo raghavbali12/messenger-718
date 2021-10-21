@@ -4,7 +4,7 @@ import { BadgeAvatar, ChatContent } from "../Sidebar";
 import { makeStyles } from "@material-ui/core/styles";
 import { setActiveChat } from "../../store/activeConversation";
 import { connect } from "react-redux";
-import { updateMessage } from "../../store/utils/thunkCreators";
+import { updateReadMessages } from "../../store/utils/thunkCreators";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -27,22 +27,12 @@ const Chat = (props) => {
   const { otherUser } = conversation;
 
   const handleClick = async (conversation) => {
-    conversation.messages.map(async (message) => {
-      if (message.senderId === otherUser.id) { //Send data to the thunk to update the message and state
-        const reqBody = {
-          text: message.text,
-          recipientId: conversation.otherUser.id,
-          conversationId: conversation.id,
-          otherUsername: conversation.otherUser.username,
-          sender: null,
-          read: true,
-          update: true,
-          id: message.id,
-        };
-        await props.updateMessage(reqBody);
-      }
-    })
-    await props.setActiveChat(conversation);
+    if (!conversation.id) { //If the user is clicking on a new conversation, no need to update read messages
+      await props.setActiveChat(conversation);
+    } else {
+      await props.setActiveChat(conversation);
+      await props.updateReadMessages(conversation);
+    }
   };
 
   return (
@@ -63,8 +53,8 @@ const mapDispatchToProps = (dispatch) => {
     setActiveChat: (id) => {
       dispatch(setActiveChat(id));
     },
-    updateMessage: (message) => {
-      dispatch(updateMessage(message))
+    updateReadMessages: (conversation) => {
+      dispatch(updateReadMessages(conversation))
     }
   };
 };

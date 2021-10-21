@@ -5,7 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
-  updateExistingMessage,
+  messagesRead,
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -86,10 +86,7 @@ const saveMessage = async (body) => {
 
 const sendMessage = (data, body) => {
   if (body.update) {
-    socket.emit("update-message", {
-      username: body.recipientId,
-      message: data.message
-    });
+    socket.emit("messages-read", data);
   } else {
     socket.emit("new-message", {
       message: data.message,
@@ -99,13 +96,33 @@ const sendMessage = (data, body) => {
   };  
 };
 
-export const updateMessage = (body) => async (dispatch) => {
+export const updateReadMessages = (payload) => async (dispatch) => {
   try {
-    const data = await saveMessage(body);
-    console.log(data)
-    dispatch(updateExistingMessage(body.otherUsername, data.message))
+    const conversation = payload
+    const otherUserId = conversation.otherUser.id
+    const reverseMessagesCopy = conversation.messages.slice().reverse()
+    for (let i = 0; i < reverseMessagesCopy.length; i++) {
+      const message = reverseMessagesCopy[i];
+      if ( message.read === true) { //Want this loop to run until we hit a message that has been read as there will be no unread messages after that
+        break;
+      } else if (message.senderId !== otherUserId) { //Don't want to mark messages sent by the user as read
+        continue;
+      } else {
+        const reqBody = {
+          text: message.text,
+          recipientId: otherUserId,
+          conversationId: conversation.id,
+          id: message.id,
+          sender: null,
+          read: true,
+          update: true,
+        }
+        await saveMessage(reqBody);
+      }
+    };
+    dispatch(messagesRead(conversation))
 
-    sendMessage(data, body);
+    sendMessage(conversation, {update: true});
 
   } catch (error) {
     console.error(error);

@@ -30,11 +30,11 @@ def new_message(sid, message):
         skip_sid=sid,
     )
 
-@sio.on("update-message")
-def new_message(sid, message):
+@sio.on("messages-read")
+def new_message(sid, conversation):
     sio.emit(
-        "update-message",
-        {"message": message["message"]},
+        "messages-read",
+        {"conversation": conversation},
         skip_sid=sid,
     )
 

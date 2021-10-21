@@ -25,6 +25,7 @@ class Messages(APIView):
             update = body.get("update")
             id = body.get("id")
 
+            print(conversation_id)
             if not update:
 
                 # if we already know conversation id, we can save time and just add it to message and return

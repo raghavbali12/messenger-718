@@ -24,24 +24,24 @@ export const addMessageToStore = (state, payload) => {
   });
 };
 
-export const markMessageAsRead = (state, payload) => {
-  const message = payload.message 
-  
+export const markMessagesAsRead = (state, payload) => {
+  const conversation = payload.conversation
+  const otherUserId = payload.conversation.otherUser.id
   return state.map((convo) => {
-    if (convo.id === message.conversationId) {
+    if (convo.id === conversation.id) {
       const convoCopy = { ...convo }; //create a copy of convo so that state isn't mutated
       convoCopy.messages = [ ...convo.messages ]; //create a copy of the messages array because ... only copies the first level
-      convoCopy.messages = convoCopy.messages.map((convoMessage) => {
-        if (convoMessage.id === message.id) {
-          
-          const messageCopy = { ...message };
-          messageCopy.read = true;
-          return messageCopy;
+      for (let i = (convoCopy.messages.length - 1); i !== 0; i--) {
+        convoCopy.messages[i] = { ...convo.messages[i] }
+        const message = convoCopy.messages[i]
+        if ( message.read === true) { //Short circuit: want this loop to run until we hit a message that has been read as there will be no unread messages after that
+          break;
+        } else if (message.senderId !== otherUserId) { //Don't want to mark messages sent by the user as read
+          continue;
+        } else {
+          message.read = true;
         }
-        else {
-          return convoMessage
-        }
-      });
+      }
       return convoCopy
     } else {
       return convo
