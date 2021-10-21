@@ -79,23 +79,33 @@ export const fetchConversations = () => async (dispatch) => {
   }
 };
 
-export const saveMessage = async (body) => {
+const saveMessage = async (body) => {
   const { data } = await axios.post("/api/messages", body);
   return data;
 };
 
 const sendMessage = (data, body) => {
-  socket.emit("new-message", {
-    message: data.message,
-    recipientId: body.recipientId,
-    sender: data.sender,
-  });
+  if (body.update) {
+    socket.emit("update-message", {
+      username: body.recipientId,
+      message: data.message
+    });
+  } else {
+    socket.emit("new-message", {
+      message: data.message,
+      recipientId: body.recipientId,
+      sender: data.sender,
+    });
+  };  
 };
 
 export const updateMessage = (body) => async (dispatch) => {
   try {
     const data = await saveMessage(body);
+    console.log(data)
     dispatch(updateExistingMessage(body.otherUsername, data.message))
+
+    sendMessage(data, body);
 
   } catch (error) {
     console.error(error);
