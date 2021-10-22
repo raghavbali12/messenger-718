@@ -100,7 +100,7 @@ export const updateReadMessages = (payload) => async (dispatch) => {
   try {
     const conversation = payload
     const otherUserId = conversation.otherUser.id
-    for (let i = (conversation.messages.length-1); i !== 0; i--) {
+    for (let i = (conversation.messages.length-1); i >= 0; i--) {
       const message = conversation.messages[i];
       if ( message.read === true) { //Short circuit: want this loop to run until we hit a message that has been read as there will be no unread messages after that
         break;

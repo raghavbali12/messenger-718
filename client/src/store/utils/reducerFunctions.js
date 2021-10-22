@@ -31,7 +31,7 @@ export const markMessagesAsRead = (state, payload) => {
     if (convo.id === conversation.id) {
       const convoCopy = { ...convo }; //create a copy of convo so that state isn't mutated
       convoCopy.messages = [ ...convo.messages ]; //create a copy of the messages array because ... only copies the first level
-      for (let i = (convoCopy.messages.length - 1); i !== 0; i--) {
+      for (let i = (convoCopy.messages.length - 1); i >= 0; i--) {
         convoCopy.messages[i] = { ...convo.messages[i] }
         const message = convoCopy.messages[i]
         if ( message.read === true) { //Short circuit: want this loop to run until we hit a message that has been read as there will be no unread messages after that
