@@ -25,6 +25,17 @@ const Chat = (props) => {
   const classes = useStyles();
   const { conversation } = props;
   const { otherUser } = conversation;
+  var unreadMessages = 0;
+
+  for (let i = (conversation.messages.length-1); i >= 0; i--) { //Count the number of unread messages to pass to ChatContent
+    const message = conversation.messages[i];
+    if (message.read) {
+      break;
+    }
+    else if (message.senderId === otherUser.id && message.read === false) {
+      unreadMessages++;
+    }
+  }
 
   const handleClick = async (conversation) => {
     if (!conversation.id) { //If the user is clicking on a new conversation, no need to update read messages
@@ -43,7 +54,7 @@ const Chat = (props) => {
         online={otherUser.online}
         sidebar={true}
       />
-      <ChatContent conversation={conversation} />
+      <ChatContent conversation={conversation} unreadMessages={unreadMessages}/>
     </Box>
   );
 };
