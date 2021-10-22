@@ -15,18 +15,19 @@ class Messages(APIView):
             if user.is_anonymous:
                 return HttpResponse(status=401)
 
+            #data needed for both cases: new message and message update
             body = request.data
-            sender_id = user.id
-            conversation_id = body.get("conversationId")
-            text = body.get("text")
-            recipient_id = body.get("recipientId")
-            sender = body.get("sender")
-            read = body.get("read")
             update = body.get("update")
-            id = body.get("id")
+            conversation_id = body.get("conversationId")
+            
 
-            print(conversation_id)
             if not update:
+
+                sender_id = user.id
+                text = body.get("text")
+                recipient_id = body.get("recipientId")
+                sender = body.get("sender")
+                read = body.get("read")
 
                 # if we already know conversation id, we can save time and just add it to message and return
                 if conversation_id:
@@ -54,6 +55,7 @@ class Messages(APIView):
                 return JsonResponse({"message": message_json, "sender": sender})
             
             else:
+                id = body.get("id")
                 #Update the message row in the sql table
                 conversation = Conversation.objects.filter(id=conversation_id).first()
                 message = Message.objects.get(pk=id)

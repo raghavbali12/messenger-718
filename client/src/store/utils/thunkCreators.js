@@ -100,17 +100,14 @@ export const updateReadMessages = (payload) => async (dispatch) => {
   try {
     const conversation = payload
     const otherUserId = conversation.otherUser.id
-    const reverseMessagesCopy = conversation.messages.slice().reverse()
-    for (let i = 0; i < reverseMessagesCopy.length; i++) {
-      const message = reverseMessagesCopy[i];
-      if ( message.read === true) { //Want this loop to run until we hit a message that has been read as there will be no unread messages after that
+    for (let i = (conversation.messages.length-1); i !== 0; i--) {
+      const message = conversation.messages[i];
+      if ( message.read === true) { //Short circuit: want this loop to run until we hit a message that has been read as there will be no unread messages after that
         break;
-      } else if (message.senderId !== otherUserId) { //Don't want to mark messages sent by the user as read
+      } else if (message.senderId !== otherUserId) { //Don't want to mark messages sent by the user as read, only messaages sent by the other user
         continue;
       } else {
         const reqBody = {
-          text: message.text,
-          recipientId: otherUserId,
           conversationId: conversation.id,
           id: message.id,
           sender: null,
