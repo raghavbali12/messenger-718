@@ -31,7 +31,7 @@ def new_message(sid, message):
     )
 
 @sio.on("messages-read")
-def new_message(sid, conversation):
+def message_read(sid, conversation):
     sio.emit(
         "messages-read",
         {"conversation": conversation},
