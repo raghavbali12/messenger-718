@@ -1,16 +1,20 @@
 const SET_ACTIVE_CHAT = "SET_ACTIVE_CHAT";
+const ADD_CONVERSATION = "ADD_CONVERSATION"
 
-export const setActiveChat = (conversation) => {
+export const setActiveChat = (conversationId) => {
   return {
     type: SET_ACTIVE_CHAT,
-    payload: { username: conversation.otherUser.username, conversation: conversation }
+    payload: { conversationId }
   };
 };
 
 const reducer = (state = "", action) => {
   switch (action.type) {
     case SET_ACTIVE_CHAT: {
-        return action.payload.username;
+        return action.payload.conversationId;
+    }
+    case ADD_CONVERSATION: {
+      return action.payload.newMessage.conversationId;
     }
     default:
       return state;

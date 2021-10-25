@@ -39,9 +39,9 @@ const Chat = (props) => {
 
   const handleClick = async (conversation) => {
     if (!conversation.id) { //If the user is clicking on a new conversation, no need to update read messages
-      await props.setActiveChat(conversation);
+      await props.setActiveChat(conversation.id);
     } else {
-      await props.setActiveChat(conversation);
+      await props.setActiveChat(conversation.id);
       await props.updateReadMessages(conversation);
     }
   };

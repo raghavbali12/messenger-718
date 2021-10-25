@@ -85,7 +85,7 @@ export const addSearchedUsersToStore = (state, users) => {
   users.forEach((user) => {
     // only create a fake convo if we don't already have a convo with this user
     if (!currentUsers[user.id]) {
-      let fakeConvo = { otherUser: user, messages: [] };
+      let fakeConvo = { id: 0, otherUser: user, messages: [] };
       newState.push(fakeConvo);
     }
   });
@@ -95,7 +95,7 @@ export const addSearchedUsersToStore = (state, users) => {
 
 export const addNewConvoToStore = (state, recipientId, message) => {
   return state.map((convo) => {
-    if (convo.otherUser.id === recipientId) {
+    if (convo.id === 0) { //Placeholder id, upgrade it to an actual convo with an actual id.
       const convoCopy = { ...convo }
       convoCopy.id = message.conversationId;
       convoCopy.messages = [ ...convo.messages ]
