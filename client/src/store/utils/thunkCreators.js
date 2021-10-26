@@ -73,11 +73,29 @@ export const logout = (id) => async (dispatch) => {
 export const fetchConversations = () => async (dispatch) => {
   try {
     const { data } = await axios.get("/api/conversations");
+    for (let i = 0; i < data.length; i++) { //grab the number of unread messages for each convo
+      const conversation = data[i]
+      conversation.unreadMessages = countUnreadMessages(conversation)
+    }
     dispatch(gotConversations(data));
   } catch (error) {
     console.error(error);
   }
 };
+
+const countUnreadMessages = (conversation) => {
+  var unreadMessages = 0;
+  for (let i = (conversation.messages.length - 1); i >= 0; i--) {
+    const message = conversation.messages[i]
+    if (message.read) { //once we have a message.read = true, break the loop since there cannot be any more unread messages
+      break; 
+    }
+    else if (message.senderId === conversation.otherUser.id && message.read === false) {
+      unreadMessages++;
+    }
+  }
+  return unreadMessages;
+}
 
 const saveMessage = async (body) => {
   const { data } = await axios.post("/api/messages", body);

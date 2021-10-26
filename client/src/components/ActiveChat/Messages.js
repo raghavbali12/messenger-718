@@ -5,10 +5,10 @@ import moment from "moment";
 
 const Messages = (props) => {
   const { messages, otherUser, userId } = props;
-  var lastReadMessageId = null;
+  let lastReadMessageId = null;
   for (let i = (messages.length-1); i >= 0; i--) { //Iterate backwards through the messages and find the last read message sent by the user
     const message = messages[i];
-    if (userId === message.senderId && message.read === true) {
+    if (userId === message.senderId && message.read) {
       lastReadMessageId = message.id;
       break;
     }

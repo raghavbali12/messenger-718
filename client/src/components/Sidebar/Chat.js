@@ -25,22 +25,7 @@ const Chat = (props) => {
   const classes = useStyles();
   const { conversation } = props;
   const { otherUser } = conversation;
-  
-  const countUnreadMessages = (conversation) => {
-    var unreadMessages = 0;
-    for (let i = (conversation.messages.length - 1); i >= 0; i--) {
-      const message = conversation.messages[i]
-      if (message.read) { //once we have a message.read = true, break the loop since there cannot be any more unread messages
-        break; 
-      }
-      else if (message.senderId === conversation.otherUser.id && message.read === false) {
-        unreadMessages++;
-      }
-    }
-    return unreadMessages;
-  }
-
-  const unreadMessages = countUnreadMessages(conversation)
+  const unreadMessages = conversation.unreadMessages
 
   const handleClick = async (conversation) => {
     if (!conversation.id) { //If the user is clicking on a new conversation, no need to update read messages

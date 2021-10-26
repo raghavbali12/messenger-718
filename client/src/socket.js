@@ -21,8 +21,8 @@ socket.on("connect", () => {
     store.dispatch(removeOfflineUser(id));
   });
   socket.on("new-message", (data) => {
-    store.dispatch(setNewMessage(data.message, data.sender));
     const currentState = store.getState();
+    store.dispatch(setNewMessage(data.message, data.sender, currentState.activeConversation));
     if (data.message.conversationId === currentState.activeConversation) { //Check to see if the receiving user has the active chat set for the sending user's convo
       for (let i = 0;i < currentState.conversations.length; i++) {
         if (currentState.conversations[i].id === currentState.activeConversation) { //Search for the conversation to update and then run the thunk function on it

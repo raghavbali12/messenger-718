@@ -1,11 +1,12 @@
 export const addMessageToStore = (state, payload) => {
-  const { message, sender } = payload;
+  const { message, sender, otherUserActiveConvo } = payload;
   // if sender isn't null, that means the message needs to be put in a brand new convo
   if (sender !== null) {
     const newConvo = {
       id: message.conversationId,
       otherUser: sender,
       messages: [message],
+      unreadMessages: 1, //count this new message as unread
     };
     newConvo.latestMessageText = message.text;
     return [newConvo, ...state];
@@ -17,6 +18,9 @@ export const addMessageToStore = (state, payload) => {
       convoCopy.messages = [ ...convo.messages ]; //create a copy of the messages array because ... only copies the first level
       convoCopy.messages.push(message);
       convoCopy.latestMessageText = message.text;
+      if (convoCopy.otherUser.id === message.senderId && otherUserActiveConvo !== message.conversationId) { //increment the unread messages count if the message was sent by the other user, only if the user is not on the same chat
+        convoCopy.unreadMessages++;
+      }
       return convoCopy;
     } else {
       return convo;
@@ -40,8 +44,9 @@ export const markMessagesAsRead = (state, conversation) => {
         } else {
           message.read = true;
         }
+        convoCopy.unreadMessages = 0; //whenever this reducer is called, the state should be updated to bring unreadMessages to 0
       }
-      return convoCopy
+      return convoCopy;
     } else {
       return convo
     }
@@ -84,7 +89,7 @@ export const addSearchedUsersToStore = (state, users) => {
   users.forEach((user) => {
     // only create a fake convo if we don't already have a convo with this user
     if (!currentUsers[user.id]) {
-      let fakeConvo = { otherUser: user, messages: [] };
+      let fakeConvo = { otherUser: user, messages: [], unreadMessages: 0 };
       newState.push(fakeConvo);
     }
   });
