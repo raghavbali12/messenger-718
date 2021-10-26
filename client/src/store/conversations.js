@@ -37,7 +37,7 @@ export const setNewMessage = (message, sender) => {
 export const messagesRead = (conversation) => {
   return {
     type: MESSAGES_READ,
-    payload: { conversation }
+    conversation
   }
 }
 
@@ -85,7 +85,7 @@ const reducer = (state = [], action) => {
     case SET_MESSAGE:
       return addMessageToStore(state, action.payload);
     case MESSAGES_READ: {
-      return markMessagesAsRead(state, action.payload)
+      return markMessagesAsRead(state, action.conversation)
     }
     case ADD_ONLINE_USER: {
       return addOnlineUserToStore(state, action.id);

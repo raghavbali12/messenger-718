@@ -25,21 +25,26 @@ const Chat = (props) => {
   const classes = useStyles();
   const { conversation } = props;
   const { otherUser } = conversation;
-  var unreadMessages = 0;
-
-  for (let i = (conversation.messages.length-1); i >= 0; i--) { //Count the number of unread messages to pass to ChatContent
-    const message = conversation.messages[i];
-    if (message.read) {
-      break;
+  
+  const countUnreadMessages = (conversation) => {
+    var unreadMessages = 0;
+    for (let i = (conversation.messages.length - 1); i >= 0; i--) {
+      const message = conversation.messages[i]
+      if (message.read) { //once we have a message.read = true, break the loop since there cannot be any more unread messages
+        break; 
+      }
+      else if (message.senderId === conversation.otherUser.id && message.read === false) {
+        unreadMessages++;
+      }
     }
-    else if (message.senderId === otherUser.id && message.read === false) {
-      unreadMessages++;
-    }
+    return unreadMessages;
   }
+
+  const unreadMessages = countUnreadMessages(conversation)
 
   const handleClick = async (conversation) => {
     if (!conversation.id) { //If the user is clicking on a new conversation, no need to update read messages
-      await props.setActiveChat(conversation.id);
+      await props.setActiveChat(conversation.otherUser.username); //set the activeConversation to be the username as a placeholder since we don't have a convo id
     } else {
       await props.setActiveChat(conversation.id);
       await props.updateReadMessages(conversation);

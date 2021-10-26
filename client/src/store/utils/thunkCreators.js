@@ -96,9 +96,8 @@ const sendMessage = (data, body) => {
   };  
 };
 
-export const updateReadMessages = (payload) => async (dispatch) => {
+export const updateReadMessages = (conversation) => async (dispatch) => {
   try {
-    const conversation = payload
     const otherUserId = conversation.otherUser.id
     for (let i = (conversation.messages.length-1); i >= 0; i--) {
       const message = conversation.messages[i];
@@ -107,8 +106,7 @@ export const updateReadMessages = (payload) => async (dispatch) => {
       } else if (message.senderId !== otherUserId) { //Don't want to mark messages sent by the user as read, only messaages sent by the other user
         continue;
       } else {
-        const reqBody = {
-          conversationId: conversation.id,
+        const reqBody = { //Construct the body for the message update and mark both read and update as true
           id: message.id,
           sender: null,
           read: true,
@@ -119,7 +117,7 @@ export const updateReadMessages = (payload) => async (dispatch) => {
     };
     dispatch(messagesRead(conversation))
 
-    sendMessage(conversation, {update: true});
+    sendMessage(conversation, {update: true}); //send a message to the other user that their message was read
 
   } catch (error) {
     console.error(error);
@@ -131,6 +129,7 @@ export const updateReadMessages = (payload) => async (dispatch) => {
 export const postMessage = (body) => async (dispatch) => {
   try {
     const data = await saveMessage(body);
+    console.log(data)
 
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));

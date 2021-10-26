@@ -37,10 +37,12 @@ const OtherUserBubble = (props) => {
   return (
     <Box className={classes.root}>
       <Avatar alt={otherUser.username} src={otherUser.photoUrl} className={classes.avatar}></Avatar>
-      <Box>
+      <Box display="flex" flexDirection="column" alignItems="flex-start">
+        <Box>
         <Typography className={classes.usernameDate}>
           {otherUser.username} {time}
         </Typography>
+        </Box>
         <Box className={classes.bubble}>
           <Typography className={classes.text}>{text}</Typography>
         </Box>

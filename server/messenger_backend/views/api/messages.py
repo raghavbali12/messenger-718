@@ -18,11 +18,11 @@ class Messages(APIView):
             #data needed for both cases: new message and message update
             body = request.data
             update = body.get("update")
-            conversation_id = body.get("conversationId")
             
 
             if not update:
 
+                conversation_id = body.get("conversationId")
                 sender_id = user.id
                 text = body.get("text")
                 recipient_id = body.get("recipientId")
@@ -57,7 +57,6 @@ class Messages(APIView):
             else:
                 id = body.get("id")
                 #Update the message row in the sql table
-                conversation = Conversation.objects.filter(id=conversation_id).first()
                 message = Message.objects.get(pk=id)
                 message.read = True
                 message.save()

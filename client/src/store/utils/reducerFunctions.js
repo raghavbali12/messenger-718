@@ -24,14 +24,13 @@ export const addMessageToStore = (state, payload) => {
   });
 };
 
-export const markMessagesAsRead = (state, payload) => {
-  const conversation = payload.conversation
-  const otherUserId = payload.conversation.otherUser.id
+export const markMessagesAsRead = (state, conversation) => {
+  const otherUserId = conversation.otherUser.id
   return state.map((convo) => {
     if (convo.id === conversation.id) {
       const convoCopy = { ...convo }; //create a copy of convo so that state isn't mutated
       convoCopy.messages = [ ...convo.messages ]; //create a copy of the messages array because ... only copies the first level
-      for (let i = (convoCopy.messages.length - 1); i >= 0; i--) {
+      for (let i = (convoCopy.messages.length - 1); i >= 0; i--) { //within the convo, loop through its messages
         convoCopy.messages[i] = { ...convo.messages[i] }
         const message = convoCopy.messages[i]
         if ( message.read === true) { //Short circuit: want this loop to run until we hit a message that has been read as there will be no unread messages after that
@@ -85,7 +84,7 @@ export const addSearchedUsersToStore = (state, users) => {
   users.forEach((user) => {
     // only create a fake convo if we don't already have a convo with this user
     if (!currentUsers[user.id]) {
-      let fakeConvo = { id: 0, otherUser: user, messages: [] };
+      let fakeConvo = { otherUser: user, messages: [] };
       newState.push(fakeConvo);
     }
   });
@@ -95,7 +94,7 @@ export const addSearchedUsersToStore = (state, users) => {
 
 export const addNewConvoToStore = (state, recipientId, message) => {
   return state.map((convo) => {
-    if (convo.id === 0) { //Placeholder id, upgrade it to an actual convo with an actual id.
+    if (convo.otherUser.id === recipientId) { 
       const convoCopy = { ...convo }
       convoCopy.id = message.conversationId;
       convoCopy.messages = [ ...convo.messages ]
