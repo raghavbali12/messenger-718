@@ -30,7 +30,11 @@ export const gotConversations = (conversations) => {
 export const setNewMessage = (message, sender, otherUserActiveConvo) => { //otherUserActiveConvo is needed to determine if the unread message counter should increase
   return {
     type: SET_MESSAGE,
-    payload: { message, sender: sender || null, otherUserActiveConvo: otherUserActiveConvo || null },
+    payload: { 
+      message, 
+      sender: sender || null, 
+      otherUserActiveConvo: otherUserActiveConvo || null 
+    },
   };
 };
 

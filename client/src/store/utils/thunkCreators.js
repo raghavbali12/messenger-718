@@ -102,6 +102,11 @@ const saveMessage = async (body) => {
   return data;
 };
 
+const updateMessages = async (messageList) => {
+  const { data } = await axios.post("/api/updatemessages", messageList);
+  return data;
+};
+
 const sendMessage = (data, body) => {
   if (body.update) {
     socket.emit("messages-read", data);
@@ -116,7 +121,8 @@ const sendMessage = (data, body) => {
 
 export const updateReadMessages = (conversation) => async (dispatch) => {
   try {
-    const otherUserId = conversation.otherUser.id
+    const otherUserId = conversation.otherUser.id;
+    let messageUpdateList = {conversationId: conversation.id, messageList:[]};
     for (let i = (conversation.messages.length-1); i >= 0; i--) {
       const message = conversation.messages[i];
       if ( message.read === true) { //Short circuit: want this loop to run until we hit a message that has been read as there will be no unread messages after that
@@ -124,18 +130,15 @@ export const updateReadMessages = (conversation) => async (dispatch) => {
       } else if (message.senderId !== otherUserId) { //Don't want to mark messages sent by the user as read, only messaages sent by the other user
         continue;
       } else {
-        const reqBody = { //Construct the body for the message update and mark both read and update as true
-          id: message.id,
-          sender: null,
-          read: true,
-          update: true,
-        }
-        await saveMessage(reqBody);
+        messageUpdateList.messageList.push(message.id) //add to list of message ids that need to be updated
       }
     };
-    dispatch(messagesRead(conversation))
+    if (messageUpdateList.messageList.length !== 0) { //only send data if at least one message has been updated
+    await updateMessages(messageUpdateList);
+      dispatch(messagesRead(conversation))
 
-    sendMessage(conversation, {update: true}); //send a message to the other user that their message was read
+      sendMessage(conversation, {update: true}); //send a message to the other user that their message was read
+    }
 
   } catch (error) {
     console.error(error);
@@ -153,7 +156,6 @@ export const postMessage = (body) => async (dispatch) => {
     } else {
       dispatch(setNewMessage(data.message));
       }
-
       sendMessage(data, body);
     } catch (error) {
       console.error(error);
