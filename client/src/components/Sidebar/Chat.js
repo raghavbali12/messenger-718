@@ -4,6 +4,8 @@ import { BadgeAvatar, ChatContent } from "../Sidebar";
 import { makeStyles } from "@material-ui/core/styles";
 import { setActiveChat } from "../../store/activeConversation";
 import { connect } from "react-redux";
+import { updateReadMessages } from "../../store/utils/thunkCreators";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,9 +25,15 @@ const Chat = (props) => {
   const classes = useStyles();
   const { conversation } = props;
   const { otherUser } = conversation;
+  const unreadMessages = conversation.unreadMessages
 
   const handleClick = async (conversation) => {
-    await props.setActiveChat(conversation.otherUser.username);
+    if (!conversation.id) { //If the user is clicking on a new conversation, no need to update read messages
+      await props.setActiveChat(conversation.otherUser.username); //set the activeConversation to be the username as a placeholder since we don't have a convo id
+    } else {
+      await props.setActiveChat(conversation.id);
+      await props.updateReadMessages(conversation);
+    }
   };
 
   return (
@@ -36,7 +44,7 @@ const Chat = (props) => {
         online={otherUser.online}
         sidebar={true}
       />
-      <ChatContent conversation={conversation} />
+      <ChatContent conversation={conversation} unreadMessages={unreadMessages}/>
     </Box>
   );
 };
@@ -45,6 +53,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setActiveChat: (id) => {
       dispatch(setActiveChat(id));
+    },
+    updateReadMessages: (conversation) => {
+      dispatch(updateReadMessages(conversation))
     }
   };
 };
