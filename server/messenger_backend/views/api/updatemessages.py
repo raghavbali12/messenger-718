@@ -19,7 +19,6 @@ class UpdateMessages(APIView):
             #data needed for update
             data = request.data
             conversation_id = data.get("conversationId")
-            messageList = data.get("messageList")
 
             conversation = Conversation.objects.filter(id=conversation_id).first()
 
@@ -27,11 +26,9 @@ class UpdateMessages(APIView):
             if (user.id != conversation.user1.id) and (user.id != conversation.user2.id): 
                 return HttpResponse(status=403)
 
-            for message_id in messageList:
-            #Update the message row in the sql table
-                message = Message.objects.get(pk=message_id)
-                message.read = True
-                message.save()
+            #Update the message rows in the sql table
+            Message.objects.filter(conversation_id = conversation_id).update(read=True)
             return JsonResponse({"Success": "Success"})
+
         except Exception as e:
             return HttpResponse(status=500)

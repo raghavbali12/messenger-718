@@ -103,7 +103,7 @@ const saveMessage = async (body) => {
 };
 
 const updateMessages = async (messageList) => {
-  const { data } = await axios.post("/api/updatemessages", messageList);
+  const { data } = await axios.post("/api/messages/read", messageList);
   return data;
 };
 
