@@ -7,7 +7,6 @@ from django.utils.translation import gettext_lazy as _
 
 from . import utils
 from .user import User
-from server.messenger_backend.models import user
 
 
 class Conversation(utils.CustomModel):
@@ -24,7 +23,10 @@ class Conversation(utils.CustomModel):
         )
     
     
-    participants = ArrayField(models.IntegerField(validators=[validate_user_id])) #set participants to be a list of user ids, but validate that they exist first
+    participants = models.ManyToManyField('User') #use this field since conversations-users is a many to many relationship
   
     createdAt = models.DateTimeField(auto_now_add=True, db_index=True)
     updatedAt = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.id
